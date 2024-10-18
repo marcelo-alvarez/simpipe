@@ -1,0 +1,99 @@
+
+%----  Relevant files 
+InitCondFile         ./dummy.dat       % we will here create the ICs upon startup
+OutputDir            DIR_REPLACE/output
+SnapshotFileBase     snapshot
+OutputListFilename   outputs.txt
+
+
+%---- File formats
+ICFormat             1
+SnapFormat           3 
+
+%---- CPU-time limits
+TimeLimitCPU              864000   % 10 * 24h, in seconds
+CpuTimeBetRestartFile     21600    % 6h,  in seconds
+
+%----- Memory alloction
+MaxMemSize                8000     % in MByte
+
+%---- Caracteristics of run
+TimeBegin                 0.015625   % Begin of the simulation, z = 63
+TimeMax	                  100.0        % End of the simulation,   z = -0.99
+
+%---- Basic code options that set the type of simulation
+ComovingIntegrationOn     1 
+
+%---- Cosmological parameters
+Omega0	                  0.315
+OmegaLambda               0.685
+OmegaBaryon               0.0482
+HubbleParam               0.674
+Hubble                    100.0
+BoxSize                   BOX_REPLACE  ;  Mpc/h
+
+%---- Output frequency and output paramaters
+OutputListOn              0
+TimeBetSnapshot           1.54445214
+TimeOfFirstSnapshot       0.02
+TimeBetStatistics         0.01
+NumFilesPerSnapshot       1
+MaxFilesWithConcurrentIO  1 
+
+%---- Accuracy of time integration
+ErrTolIntAccuracy        0.025
+CourantFac               0.3
+MaxSizeTimestep          0.005
+MinSizeTimestep          0.0 
+
+%---- Tree algorithm, force accuracy, domain update frequency
+TypeOfOpeningCriterion                1
+ErrTolTheta                           0.75
+ErrTolThetaMax                        1.0
+ErrTolForceAcc                        0.002
+TopNodeFactor                         3.0
+
+ActivePartFracForNewDomainDecomp      0.01
+#ActivePartFracForPMinsteadOfEwald     0.05
+
+%---- Initial density estimate
+DesNumNgb                        64
+MaxNumNgbDeviation               1 
+
+%---- System of units
+UnitLength_in_cm         3.085678e24        ;  Mpc / h
+UnitMass_in_g            1.989e43           ;  1.0e10 Msun / h
+UnitVelocity_in_cm_per_s 1e5                ;  1 km/sec
+GravityConstantInternal  0
+
+
+%---- Gravitational softening length
+SofteningComovingClass0      SOFT_REPLACE  ;  Mpc/h
+SofteningMaxPhysClass0       SOFT_REPLACE  ;  Mpc/h
+
+SofteningClassOfPartType0    0
+SofteningClassOfPartType1    0
+
+
+%----- FOF
+DesLinkNgb     20
+
+%----- SPH
+ArtBulkViscConst             1.0
+MinEgySpec                   0
+InitGasTemp                  0
+
+
+%----- N-GenIC
+NSample                                           N_REPLACE
+GridSize                                          N_REPLACE
+Seed                                              181170
+SphereMode                                        1
+PowerSpectrumType                                 1
+ReNormalizeInputSpectrum                          1
+PrimordialIndex                                   0.965
+ShapeGamma                                        0.21
+Sigma8                                            0.811
+PowerSpectrumFile                                 powerspec
+InputSpectrum_UnitLength_in_cm                    3.085678e21
+
