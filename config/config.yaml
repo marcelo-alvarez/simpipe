@@ -9,6 +9,7 @@ sherlock:
   mempernode:  '250G'
   partition:   'kipac'
   acct:        None
+  mpiexe:      'srun'
 s3df:
   env:         '/sdf/group/kipac/simpipe'
   systype:     'Generic-gcc'
@@ -18,3 +19,4 @@ s3df:
   mempernode:  '480G'
   partition:   'milano'
   acct:        'kipac'
+  mpiexe:      'mpiexec'

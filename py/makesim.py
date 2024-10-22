@@ -54,6 +54,7 @@ taskpernode = params['taskpernode']
 mempernode  = params['mempernode']
 partition   = params['partition']
 acct        = params['acct']
+mpiexe      = params['mpiexe']
 
 # # derived parameters
 boxsize = params['boxsize']
@@ -81,11 +82,19 @@ os.makedirs(rundir)
 os.makedirs(outdir)
 
 # get gadget source
-if os.path.isdir(srcdir): 
-    shutil.rmtree(srcdir)
-print("  downloading Gadget4 ...")
-subprocess.call(f"git clone https://gitlab.mpcdf.mpg.de/vrs/gadget4.git {srcdir} &> /dev/null", shell=True)
-subprocess.call(f"cd {srcdir} ; git reset --hard {commit} &> /dev/null", shell=True)
+if params['drylev'] >= 3:
+    print(f"  DRY RUN: git clone https://gitlab.mpcdf.mpg.de/vrs/gadget4.git {srcdir}")
+    print(f"  DRY RUN: cd {srcdir} ; git reset --hard {commit}")
+    print(f"  DRY RUN: sed -i -e 's/errflag = 1/errflag = 0/g' {srcdir}/src/data/mymalloc.cc")
+    subprocess.call(f"mkdir -p {srcdir}/buildsystem &> /dev/null", shell=True)
+else:
+    print("  downloading Gadget4 ...")
+    if os.path.isdir(srcdir):
+        shutil.rmtree(srcdir)
+    subprocess.call(f"git clone https://gitlab.mpcdf.mpg.de/vrs/gadget4.git {srcdir} &> /dev/null", shell=True)
+    subprocess.call(f"cd {srcdir} ; git reset --hard {commit} &> /dev/null", shell=True)
+    # disable error when /dev/shmem is too small
+    subprocess.call(f'sed -i -e "s/errflag = 1/errflag = 0/g" {srcdir}/src/data/mymalloc.cc', shell=True)
 
 # configuration file
 subprocess.call(f'cp {templatedir}/Config-template.sh {srcdir}/tmpfile', shell=True)
@@ -129,10 +138,8 @@ subprocess.call(f'sed -i -e "s/MPN_REPLACE/{mempernode}/g"  {rundir}/tmpfile', s
 subprocess.call(f'sed -i -e "s/EMAIL_REPLACE/{email}/g"     {rundir}/tmpfile', shell=True)
 subprocess.call(f'sed -i -e "s:ENVPATH_REPLACE:{env}:g"     {rundir}/tmpfile', shell=True)
 subprocess.call(f'sed -i -e "s/NTASK_REPLACE/{Ntasks}/g"    {rundir}/tmpfile', shell=True)
+subprocess.call(f'sed -i -e "s/MPIEXE_REPLACE/{mpiexe}/g"   {rundir}/tmpfile', shell=True)
 subprocess.call(f'mv {rundir}/tmpfile {rundir}/launch.sh', shell=True)
-
-# disable error when /dev/shmem is too small
-subprocess.call(f'sed -i -e "s/errflag = 1/errflag = 0/g" {srcdir}/src/data/mymalloc.cc', shell=True)
 
 # compile gadget
 if params['drylev'] >= 2:

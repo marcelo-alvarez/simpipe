@@ -11,7 +11,7 @@ gsl_version=gsl-2.8
 fftw3=1
 fftw3_version=fftw-3.3.10
 
-hdf5=1
+hdf5=0
 hdf5_version=hdf5-1.14.4-3
 
 locallib=$simpipedir/lib/
@@ -36,10 +36,9 @@ elif [ $gsl -gt 0 ] ; then
     ./configure --prefix=$PWD
     make -j$ncompile_threads
     make install -j$ncompile_threads
-
-    cp -r $SCRATCH/$fftw3_version/include/gsl $localinc/
-    cp $SCRATCH/$fftw3_version/lib/*     $locallib
 fi
+cp -r $SCRATCH/$gsl_version/include/gsl $localinc/
+cp    $SCRATCH/$gsl_version/lib/*       $locallib
 
 # FFTW3
 if [ $fftw3 -gt 0 ] ; then

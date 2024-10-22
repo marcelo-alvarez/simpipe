@@ -20,5 +20,5 @@ cd DIR_REPLACE
 
 echo '====Gadget4============================================'
 date
-srun -n NTASK_REPLACE ./gadget4/Gadget4 param.txt
+MPIEXE_REPLACE -n NTASK_REPLACE ./gadget4/Gadget4 param.txt
 date
