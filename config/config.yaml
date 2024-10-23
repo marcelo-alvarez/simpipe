@@ -6,7 +6,7 @@ sherlock:
   commit:      '1e171a4a'
   constraint:  'CLASS:SH3_CBASE'
   taskpernode: 32
-  mempernode:  '250G'
+  mempernode:  250
   partition:   'kipac'
   acct:        None
   mpiexe:      'srun'
@@ -16,7 +16,7 @@ s3df:
   commit:      '1e171a4a'
   constraint:  None
   taskpernode: 120
-  mempernode:  '480G'
+  mempernode:  480
   partition:   'milano'
   acct:        'kipac'
   mpiexe:      'mpiexec'

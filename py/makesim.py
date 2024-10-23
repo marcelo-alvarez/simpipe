@@ -56,6 +56,9 @@ partition   = params['partition']
 acct        = params['acct']
 mpiexe      = params['mpiexe']
 
+maxmem     = str(int(mempernode/taskpernode*1024))
+mempernode = str(mempernode)+'G'
+
 # # derived parameters
 boxsize = params['boxsize']
 N_nodes = max(1,Ntasks // taskpernode)
@@ -108,6 +111,8 @@ subprocess.call(f'sed -i -e "s/N_REPLACE/{N}/g"         {rundir}/tmpfile', shell
 subprocess.call(f'sed -i -e "s/SOFT_REPLACE/{rsoft}/g"  {rundir}/tmpfile', shell=True)
 subprocess.call(f'sed -i -e "s/BOX_REPLACE/{boxsize}/g" {rundir}/tmpfile', shell=True)
 subprocess.call(f'sed -i -e "s:DIR_REPLACE:{rundir}:g"  {rundir}/tmpfile', shell=True)
+subprocess.call(f'sed -i -e "s:MXM_REPLACE:{maxmem}:g"  {rundir}/tmpfile', shell=True)
+
 subprocess.call(f'mv {rundir}/tmpfile {rundir}/param.txt', shell=True)
 
 # systype file
