@@ -48,7 +48,7 @@ echo "#" > $summaryfile
 echo "# Gadget-4 healthtest summary for data in $PWD" >> $summaryfile
 echo "#" >> $summaryfile
 
-cat $header $tmpfile | column -t --table-right 1,2,3,4,5,6,7,8,9      >> $summaryfile
+cat $header $tmpfile | column -t      >> $summaryfile
 sed -i -e "s/___/   /g" $summaryfile
 cat $summaryfile
 rm -f $tmpfile $header
