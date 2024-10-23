@@ -7,16 +7,13 @@
 #SBATCH --mail-user=EMAIL_REPLACE
 #SBATCH --nodes=NODES_REPLACE
 #SBATCH --ntasks-per-node=TPN_REPLACE
+#SBATCH --cpus-per-task=1
 #SBATCH -J RUN_REPLACE
 #SBATCH --output=DIR_REPLACE/RUN_REPLACE.%j.oe
 #SBATCH --mem=MPN_REPLACE
 
 source ENVPATH_REPLACE/load-env.sh
-
-# based on error message "not enough space for /dev/shm/osc_sm/..."
-export OMPI_MCA_osc_sm_backing_directory=/tmp
-
-cd DIR_REPLACE
+export OMPI_MCA_osc_sm_backing_directory=/tmp # fix for "not enough space for /dev/shm/osc_sm/..."
 
 echo '====Gadget4============================================'
 date

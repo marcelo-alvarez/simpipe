@@ -5,10 +5,11 @@ import pathlib
 import subprocess
 import os
 import shutil
+import defaults as spd
+import math
 
 def parsecommandline():
     import argparse
-    import defaults as spd
 
     parsbool = argparse.BooleanOptionalAction
     parser   = argparse.ArgumentParser(description='Commandline interface to ptflow')
@@ -34,12 +35,40 @@ email = os.environ.get('EMAIL')
 with open(configfile) as fx:
     config = yaml.safe_load(fx)
 
-maxkeylen=0
+# guess total memory requirement if not provided
+if params['totmem'] == 0:
+    params['totmem'] = 720 * (params['N']/1024)**3
+
+# if benchmark specified, override parameters accordingly
+if len(params['bench']):
+    benchname = params['bench']
+    params['runname'] = benchname
+    bench = spd.benchmarks[benchname]
+
+    for benchkey in bench:
+        if benchkey == 'sim':
+            simname = bench['sim']
+            sim = spd.sims[simname]
+            for simkey in sim:
+                key = simkey
+                value = sim[key]
+        else:
+            key = benchkey
+            value = bench[key]
+        if params[key] != value:
+            print(f"  benckmark {benchname}: overriding {key} with {value}")
+            params[key] = value
+        if params['runname'] is None:
+            runname = benchname
+
+# get system configuration
 for key in config[params['system']]:
     params[key] = config[params['system']][key]
-    maxkeylen=max(maxkeylen,len(key))
 for key in params:
     print(f'{key+": ":>15} {str(params[key])}')
+
+if params['runname'] is None:
+    params['runname'] = str(params['boxsize'])+"Mpc_n"+str(params['N'])+"_p"+str(params['Npm'])
 
 # convenience variables
 N           = params['N']
@@ -55,23 +84,27 @@ mempernode  = params['mempernode']
 partition   = params['partition']
 acct        = params['acct']
 mpiexe      = params['mpiexe']
-
-maxmem     = str(int(mempernode/taskpernode*1024))
-mempernode = str(mempernode)+'G'
+runname     = params['runname']
+totmem      = params['totmem']
 
 # # derived parameters
 boxsize = params['boxsize']
-N_nodes = max(1,Ntasks // taskpernode)
+N_nodes = math.ceil(Ntasks / taskpernode)
+nodemem = math.ceil(totmem / N_nodes)
+nodemem = str(nodemem)+'G'
+
+taskpernode = math.ceil(Ntasks / N_nodes)        
+maxmem = str(int(totmem/Ntasks*1024))
+
 rsoft   = boxsize / params['N'] * params['soft']
 if boxsize%1.0 == 0:
     boxsize = int(boxsize)
-run     = str(boxsize)+"Mpc_n"+str(params['N'])+"_p"+str(params['Npm'])
 
 # # make run directories
 basedir = params['basedir']
 if basedir == 'scratch':
     basedir = os.environ.get('SCRATCH')
-rundir = basedir+"/simpipe/"+run
+rundir = basedir+"/simpipe/"+runname
 srcdir = rundir+"/gadget4"
 outdir = rundir+"/output"
 
@@ -126,8 +159,8 @@ subprocess.call(f'sed -i -e "s:ENVPATH_REPLACE:{env}:g" {srcdir}/tmpfile', shell
 subprocess.call(f'mv {srcdir}/tmpfile {srcdir}/buildsystem/Makefile.gen.libs', shell=True)
 
 # batch script
-if system == "s3df":
-    subprocess.call(f'cat {templatedir}/launch-template.sh | grep -v CONST > {rundir}/tmpfile', shell=True)
+if "s3df" in system:
+    subprocess.call(f'cat {templatedir}/launch-template.sh | grep -v CONST | grep -v osc_sm > {rundir}/tmpfile', shell=True)
     subprocess.call(f'sed -i -e "s/ACCT_REPLACE/{acct}/g" {rundir}/tmpfile', shell=True)
 else:
     subprocess.call(f'cat {templatedir}/launch-template.sh | grep -v ACCT > {rundir}/tmpfile', shell=True)
@@ -135,11 +168,11 @@ else:
 
 subprocess.call(f'sed -i -e "s/PART_REPLACE/{partition}/g"  {rundir}/tmpfile', shell=True)
 subprocess.call(f'sed -i -e "s/NODES_REPLACE/{N_nodes}/g"   {rundir}/tmpfile', shell=True)
-subprocess.call(f'sed -i -e "s/RUN_REPLACE/{run}/g"         {rundir}/tmpfile', shell=True)
+subprocess.call(f'sed -i -e "s/RUN_REPLACE/{runname}/g"     {rundir}/tmpfile', shell=True)
 subprocess.call(f'sed -i -e "s:DIR_REPLACE:{rundir}:g"      {rundir}/tmpfile', shell=True)
 subprocess.call(f'sed -i -e "s/EMAIL_REPLACE/{email}/g"     {rundir}/tmpfile', shell=True)
 subprocess.call(f'sed -i -e "s/TPN_REPLACE/{taskpernode}/g" {rundir}/tmpfile', shell=True)
-subprocess.call(f'sed -i -e "s/MPN_REPLACE/{mempernode}/g"  {rundir}/tmpfile', shell=True)
+subprocess.call(f'sed -i -e "s/MPN_REPLACE/{nodemem}/g"     {rundir}/tmpfile', shell=True)
 subprocess.call(f'sed -i -e "s/EMAIL_REPLACE/{email}/g"     {rundir}/tmpfile', shell=True)
 subprocess.call(f'sed -i -e "s:ENVPATH_REPLACE:{env}:g"     {rundir}/tmpfile', shell=True)
 subprocess.call(f'sed -i -e "s/NTASK_REPLACE/{Ntasks}/g"    {rundir}/tmpfile', shell=True)

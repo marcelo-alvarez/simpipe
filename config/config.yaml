@@ -1,22 +1,45 @@
 # n-body configuration
 
-sherlock:
+sh3-cbase:
   env:         '/oak/stanford/orgs/kipac/simpipe'
   systype:     'Generic-gcc'
   commit:      '1e171a4a'
   constraint:  'CLASS:SH3_CBASE'
   taskpernode: 32
-  mempernode:  250
+  mempernode:  256
   partition:   'kipac'
   acct:        None
   mpiexe:      'srun'
-s3df:
+
+sh4-cscale:
+  env:         '/oak/stanford/orgs/kipac/simpipe'
+  systype:     'Generic-gcc'
+  commit:      '1e171a4a'
+  constraint:  'CLASS:SH4_CSCALE'
+  taskpernode: 256
+  mempernode:  1536
+  partition:   'bigmem'
+  acct:        None
+  mpiexe:      'srun'
+
+sh4-cbase:
+  env:         '/oak/stanford/orgs/kipac/simpipe'
+  systype:     'Generic-gcc'
+  commit:      '1e171a4a'
+  constraint:  'CLASS:SH4_CBASE'
+  taskpernode: 24
+  mempernode:  192
+  partition:   'normal'
+  acct:        None
+  mpiexe:      'srun'
+
+s3df-milano:
   env:         '/sdf/group/kipac/simpipe'
   systype:     'Generic-gcc'
   commit:      '1e171a4a'
   constraint:  None
   taskpernode: 120
-  mempernode:  480
+  mempernode:  512
   partition:   'milano'
   acct:        'kipac'
   mpiexe:      'mpiexec'
