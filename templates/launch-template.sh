@@ -17,6 +17,8 @@ export OMPI_MCA_osc_sm_backing_directory=/tmp # fix for "not enough space for /d
 ulimit -n 10240
 cd DIR_REPLACE
 
+cd gadget4 ; make -j TPN_REPLACE ; cd ..
+
 echo '====Gadget4============================================'
 date
 MPIEXE_REPLACE -n NTASK_REPLACE ./gadget4/Gadget4 param.txt
