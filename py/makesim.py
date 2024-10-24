@@ -96,6 +96,10 @@ nodemem = str(nodemem)+'G'
 taskpernode = math.ceil(Ntasks / N_nodes)        
 maxmem = str(int(totmem/Ntasks*1024))
 
+nlisten = 1
+if taskpernode > 64:
+    nlisten = 2
+
 rsoft   = boxsize / params['N'] * params['soft']
 if boxsize%1.0 == 0:
     boxsize = int(boxsize)
@@ -134,8 +138,9 @@ else:
 
 # configuration file
 subprocess.call(f'cp {templatedir}/Config-template.sh {srcdir}/tmpfile', shell=True)
-subprocess.call(f'sed -i -e "s/N_REPLACE/{N}/g"     {srcdir}/tmpfile', shell=True)
-subprocess.call(f'sed -i -e "s/NPM_REPLACE/{Npm}/g" {srcdir}/tmpfile', shell=True)
+subprocess.call(f'sed -i -e "s/N_REPLACE/{N}/g"         {srcdir}/tmpfile', shell=True)
+subprocess.call(f'sed -i -e "s/NPM_REPLACE/{Npm}/g"     {srcdir}/tmpfile', shell=True)
+subprocess.call(f'sed -i -e "s/LST_REPLACE/{nlisten}/g" {srcdir}/tmpfile', shell=True)
 subprocess.call(f'mv {srcdir}/tmpfile {srcdir}/Config.sh', shell=True)
 
 # parameter file
@@ -163,7 +168,7 @@ if "s3df" in system:
     subprocess.call(f'cat {templatedir}/launch-template.sh | grep -v CONST | grep -v osc_sm > {rundir}/tmpfile', shell=True)
     subprocess.call(f'sed -i -e "s/ACCT_REPLACE/{acct}/g" {rundir}/tmpfile', shell=True)
 else:
-    subprocess.call(f'cat {templatedir}/launch-template.sh | grep -v ACCT > {rundir}/tmpfile', shell=True)
+    subprocess.call(f'cat {templatedir}/launch-template.sh | grep -v ACCT  | grep -v ulimit > {rundir}/tmpfile', shell=True)
     subprocess.call(f'sed -i -e "s/CONST_REPLACE/{constraint}/g" {rundir}/tmpfile', shell=True)
 
 subprocess.call(f'sed -i -e "s/PART_REPLACE/{partition}/g"  {rundir}/tmpfile', shell=True)

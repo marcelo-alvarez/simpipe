@@ -14,6 +14,7 @@
 
 source ENVPATH_REPLACE/load-env.sh
 export OMPI_MCA_osc_sm_backing_directory=/tmp # fix for "not enough space for /dev/shm/osc_sm/..."
+ulimit -n 10240
 cd DIR_REPLACE
 
 echo '====Gadget4============================================'
