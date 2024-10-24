@@ -90,8 +90,7 @@ totmem      = params['totmem']
 # # derived parameters
 boxsize = params['boxsize']
 N_nodes = math.ceil(Ntasks / taskpernode)
-nodemem = math.ceil(totmem / N_nodes)
-nodemem = str(nodemem)+'G'
+totmem  = str(totmem)+'G'
 
 taskpernode = math.ceil(Ntasks / N_nodes)        
 maxmem = str(int(totmem/Ntasks*1024))
@@ -176,7 +175,7 @@ subprocess.call(f'sed -i -e "s/RUN_REPLACE/{runname}/g"     {rundir}/tmpfile', s
 subprocess.call(f'sed -i -e "s:DIR_REPLACE:{rundir}:g"      {rundir}/tmpfile', shell=True)
 subprocess.call(f'sed -i -e "s/EMAIL_REPLACE/{email}/g"     {rundir}/tmpfile', shell=True)
 subprocess.call(f'sed -i -e "s/TPN_REPLACE/{taskpernode}/g" {rundir}/tmpfile', shell=True)
-subprocess.call(f'sed -i -e "s/MPN_REPLACE/{nodemem}/g"     {rundir}/tmpfile', shell=True)
+subprocess.call(f'sed -i -e "s/MPN_REPLACE/{totmem}/g"      {rundir}/tmpfile', shell=True)
 subprocess.call(f'sed -i -e "s/EMAIL_REPLACE/{email}/g"     {rundir}/tmpfile', shell=True)
 subprocess.call(f'sed -i -e "s:ENVPATH_REPLACE:{env}:g"     {rundir}/tmpfile', shell=True)
 subprocess.call(f'sed -i -e "s/NTASK_REPLACE/{Ntasks}/g"    {rundir}/tmpfile', shell=True)
