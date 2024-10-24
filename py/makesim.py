@@ -170,7 +170,6 @@ if "s3df" in system:
 else:
     subprocess.call(f'cat {templatedir}/launch-template.sh | grep -v ACCT  | grep -v ulimit > {rundir}/tmpfile', shell=True)
     subprocess.call(f'sed -i -e "s/CONST_REPLACE/{constraint}/g" {rundir}/tmpfile', shell=True)
-
 subprocess.call(f'sed -i -e "s/PART_REPLACE/{partition}/g"  {rundir}/tmpfile', shell=True)
 subprocess.call(f'sed -i -e "s/NODES_REPLACE/{N_nodes}/g"   {rundir}/tmpfile', shell=True)
 subprocess.call(f'sed -i -e "s/RUN_REPLACE/{runname}/g"     {rundir}/tmpfile', shell=True)
@@ -184,24 +183,9 @@ subprocess.call(f'sed -i -e "s/NTASK_REPLACE/{Ntasks}/g"    {rundir}/tmpfile', s
 subprocess.call(f'sed -i -e "s/MPIEXE_REPLACE/{mpiexe}/g"   {rundir}/tmpfile', shell=True)
 subprocess.call(f'mv {rundir}/tmpfile {rundir}/launch.sh', shell=True)
 
-# compile gadget
-if params['drylev'] >= 2:
-    print(f"  DRY RUN: cd {srcdir}")
-    print(f"  DRY RUN: make clean &> /dev/null")
-    print(f"  DRY RUN: make -j 32 &> {srcdir}/build.log")
-else:
-    print("  compiling Gadget4 ...")
-    subprocess.call(f"cd {srcdir} ; rm -f build.log", shell=True)
-    subprocess.call(f"cd {srcdir} ; make clean &> /dev/null", shell=True)
-    subprocess.call(f"cd {srcdir} ; make -j 32 &> {srcdir}/build.log", shell=True)
-
 # launch job
 if params['drylev'] >= 1:
     print(f"  DRY RUN: sbatch {rundir}/launch.sh")
 else:
-    if not os.path.isfile(f"{srcdir}/Gadget4"): 
-        print(f"  executable {srcdir}/Gadget4 not found")
-        print(f"    see {srcdir}/build.log for details")
-        exit()
     subprocess.call(f"sbatch {rundir}/launch.sh", shell=True)
 
