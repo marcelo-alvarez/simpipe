@@ -11,7 +11,6 @@ import math
 def parsecommandline():
     import argparse
 
-    parsbool = argparse.BooleanOptionalAction
     parser   = argparse.ArgumentParser(description='Commandline interface to ptflow')
 
     for params in spd.allparams:
@@ -19,10 +18,7 @@ def parsecommandline():
             pdval = spd.allparams[params][param]['val']
             ptype = spd.allparams[params][param]['type']
             pdesc = spd.allparams[params][param]['desc']
-            if ptype == 'bool':
-                parser.add_argument('--'+param, default=pdval, help=f'{pdesc} [{pdval}]', action=parsbool)
-            else:
-                parser.add_argument('--'+param, default=pdval, help=f'{pdesc} [{pdval}]', type=ptype)
+            parser.add_argument('--'+param, default=pdval, help=f'{pdesc} [{pdval}]', type=ptype)
 
     return vars(parser.parse_args())
 
@@ -42,7 +38,8 @@ if params['totmem'] == 0:
 # if benchmark specified, override parameters accordingly
 if len(params['bench']):
     benchname = params['bench']
-    params['runname'] = benchname
+    if params['runname'] == "":
+        params['runname'] = benchname
     bench = spd.benchmarks[benchname]
 
     for benchkey in bench:
@@ -58,8 +55,6 @@ if len(params['bench']):
         if params[key] != value:
             print(f"  benckmark {benchname}: overriding {key} with {value}")
             params[key] = value
-        if params['runname'] is None:
-            runname = benchname
 
 # get system configuration
 for key in config[params['system']]:
@@ -67,7 +62,7 @@ for key in config[params['system']]:
 for key in params:
     print(f'{key+": ":>15} {str(params[key])}')
 
-if params['runname'] is None:
+if params['runname'] == "":
     params['runname'] = str(params['boxsize'])+"Mpc_n"+str(params['N'])+"_p"+str(params['Npm'])
 
 # convenience variables
@@ -86,12 +81,12 @@ acct        = params['acct']
 mpiexe      = params['mpiexe']
 runname     = params['runname']
 totmem      = params['totmem']
+modules     = params['modules']
 
 # # derived parameters
 boxsize = params['boxsize']
 N_nodes = math.ceil(Ntasks / taskpernode)
-nodemem = math.ceil(totmem / N_nodes)
-nodemem = str(nodemem)+'G'
+nodemem = str(mempernode)+'G'
 
 taskpernode = math.ceil(Ntasks / N_nodes)        
 maxmem = str(int(totmem/Ntasks*1024))
@@ -170,6 +165,7 @@ if "s3df" in system:
 else:
     subprocess.call(f'cat {templatedir}/launch-template.sh | grep -v ACCT  | grep -v ulimit > {rundir}/tmpfile', shell=True)
     subprocess.call(f'sed -i -e "s/CONST_REPLACE/{constraint}/g" {rundir}/tmpfile', shell=True)
+subprocess.call(f'sed -i -e "s:MLOAD_REPLACE:{modules}:g"   {rundir}/tmpfile', shell=True)
 subprocess.call(f'sed -i -e "s/PART_REPLACE/{partition}/g"  {rundir}/tmpfile', shell=True)
 subprocess.call(f'sed -i -e "s/NODES_REPLACE/{N_nodes}/g"   {rundir}/tmpfile', shell=True)
 subprocess.call(f'sed -i -e "s/RUN_REPLACE/{runname}/g"     {rundir}/tmpfile', shell=True)

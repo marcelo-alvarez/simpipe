@@ -4,8 +4,10 @@ system="sh4-cscale"
 hostname=os.environ.get('HOSTNAME')
 if hostname[0:2] == "sh" and 'stanford' in hostname:
     system="sh4-cscale"
+    modules="gcc openmpi py-numpy/1.26.3_py312"
 elif hostname[0:3] == "sdf":
     system="s3df-milano"
+    modules="mpi/mpich-x86_64 hdf5/mpich-EPEL"
 
 # command line parameters
 cparams = {
@@ -19,7 +21,8 @@ cparams = {
     'basedir': {'val' :     "scratch", 'type' : str, 'desc' : 'run directory'},
     'systype': {'val' : "Generic-gcc", 'type' : str, 'desc' : 'systype'},
     'system' : {'val' :        system, 'type' : str, 'desc' : 'system'},
-    'runname': {'val' :        system, 'type' : str, 'desc' : 'run name'},
+    'modules': {'val' :       modules, 'type' : str, 'desc' : 'mpi module'},
+    'runname': {'val' :            "", 'type' : str, 'desc' : 'run name'},
     'bench'  : {'val' :            "", 'type' : str, 'desc' : 'benchmark name'}}
 
 # all parameters
@@ -55,5 +58,9 @@ benchmarks = {
     "sh4-cbase-1"  : { 'Ntasks'  : 768, 'system': 'sh4-cbase',   'sim': 'bench-1'},
 
   "s3df-milano-0"  : { 'Ntasks'  : 192, 'system': 's3df-milano', 'sim': 'bench-0'},
-  "s3df-milano-1"  : { 'Ntasks'  : 720, 'system': 's3df-milano', 'sim': 'bench-1'}
+  "s3df-milano-1"  : { 'Ntasks'  : 720, 'system': 's3df-milano', 'sim': 'bench-1'},
+
+  "s3df-milano-0-ompi"  : { 'Ntasks'  : 192, 'system': 's3df-milano', 'sim': 'bench-0',
+                            'modules' : 'mpi/openmpi-x86_64'},
+
 }

@@ -6,7 +6,7 @@ sh3-cbase:
   commit:      '1e171a4a'
   constraint:  'CLASS:SH3_CBASE'
   taskpernode: 32
-  mempernode:  256
+  mempernode:  250
   partition:   'kipac'
   acct:        None
   mpiexe:      'srun'
@@ -17,7 +17,7 @@ sh4-cscale:
   commit:      '1e171a4a'
   constraint:  'CLASS:SH4_CSCALE'
   taskpernode: 256
-  mempernode:  1536
+  mempernode:  1500
   partition:   'bigmem'
   acct:        None
   mpiexe:      'srun'
@@ -28,7 +28,7 @@ sh4-cbase:
   commit:      '1e171a4a'
   constraint:  'CLASS:SH4_CBASE'
   taskpernode: 24
-  mempernode:  192
+  mempernode:  180
   partition:   'normal'
   acct:        None
   mpiexe:      'srun'
@@ -39,7 +39,7 @@ s3df-milano:
   commit:      '1e171a4a'
   constraint:  None
   taskpernode: 120
-  mempernode:  512
+  mempernode:  480
   partition:   'milano'
   acct:        'kipac'
-  mpiexe:      'mpiexec'
+  mpiexe:      'mpiexec --bind-to core --map-by socket'
