@@ -1,7 +1,7 @@
 #!/bin/bash
 
 scriptdir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-module load py-numpy/1.26.3_py312
+source $scriptdir/load-env.sh
 alias python='python3'
 shopt -s expand_aliases
 
