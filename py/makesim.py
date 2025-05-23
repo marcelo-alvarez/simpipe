@@ -63,7 +63,9 @@ for key in params:
     print(f'{key+": ":>15} {str(params[key])}')
 
 if params['runname'] == "":
-    params['runname'] = str(params['boxsize'])+"Mpc_n"+str(params['N'])+"_p"+str(params['Npm'])
+    # Format boxsize as integer if it's a whole number
+    box_str = str(int(params['boxsize'])) if params['boxsize'] % 1 == 0 else str(params['boxsize'])
+    params['runname'] = box_str+"Mpc_n"+str(params['N'])+"_p"+str(params['Npm'])
 
 # convenience variables
 N           = params['N']
@@ -172,7 +174,7 @@ subprocess.call(f'sed -i -e "s/RUN_REPLACE/{runname}/g"     {rundir}/tmpfile', s
 subprocess.call(f'sed -i -e "s:DIR_REPLACE:{rundir}:g"      {rundir}/tmpfile', shell=True)
 subprocess.call(f'sed -i -e "s/EMAIL_REPLACE/{email}/g"     {rundir}/tmpfile', shell=True)
 subprocess.call(f'sed -i -e "s/TPN_REPLACE/{taskpernode}/g" {rundir}/tmpfile', shell=True)
-subprocess.call(f'sed -i -e "s/MPN_REPLACE/{totmem}/g"      {rundir}/tmpfile', shell=True)
+subprocess.call(f'sed -i -e "s/MPN_REPLACE/{int(totmem)}GB/g" {rundir}/tmpfile', shell=True)
 subprocess.call(f'sed -i -e "s/EMAIL_REPLACE/{email}/g"     {rundir}/tmpfile', shell=True)
 subprocess.call(f'sed -i -e "s:ENVPATH_REPLACE:{env}:g"     {rundir}/tmpfile', shell=True)
 subprocess.call(f'sed -i -e "s/NTASK_REPLACE/{Ntasks}/g"    {rundir}/tmpfile', shell=True)
@@ -184,4 +186,3 @@ if params['drylev'] >= 1:
     print(f"  DRY RUN: sbatch {rundir}/launch.sh")
 else:
     subprocess.call(f"sbatch {rundir}/launch.sh", shell=True)
-
